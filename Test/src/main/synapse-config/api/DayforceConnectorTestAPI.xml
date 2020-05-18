@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/dayforceconnector" name="DayforceConnectorTestAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="GET" uri-template="/getEmployees?employeeNumber={employeeNumber}">
+        <inSequence>
+            <property expression="$url:employeeNumber" name="uri.var.employeeNumber" scope="default" type="STRING"/>
+            <dayforce.init>
+                <username>DFWSTest</username>
+                <password>DFWSTest</password>
+                <clientNamespace>usconfigr58.dayforcehcm.com/Api/ddn</clientNamespace>
+            </dayforce.init>
+            <dayforce.get_employees>
+                <employeeNumber>{$ctx:uri.var.employeeNumber}</employeeNumber>
+            </dayforce.get_employees>
+            <respond/>
+        </inSequence>
+        <outSequence/>
+        <faultSequence/>
+    </resource>
+</api>

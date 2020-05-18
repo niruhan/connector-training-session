@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="init" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="username"/>
+    <parameter name="password"/>
+    <parameter name="clientNamespace"/>
+    <sequence>
+        <property expression="base64Encode(fn:concat($func:username,':',$func:password))" name="ceredianDayForceAuthHeader" scope="default" type="STRING"/>
+        <property expression="$func:clientNamespace" name="uri.var.clientNamespace" scope="default" type="STRING"/>
+        <filter regex="false" source="boolean($func:username)">
+            <then>
+                <log category="ERROR" level="custom">
+                    <property name="CEREDIAN Dayforce" value="User name is empty."/>
+                </log>
+            </then>
+            <else/>
+        </filter>
+        <filter regex="false" source="boolean($func:password)">
+            <then>
+                <log category="ERROR" level="custom">
+                    <property name="CEREDIAN Dayforce" value="Password is empty."/>
+                </log>
+            </then>
+            <else/>
+        </filter>
+        <filter regex="false" source="boolean($func:clientNamespace)">
+            <then>
+                <log category="ERROR" level="custom">
+                    <property name="CEREDIAN Dayforce" value="ClientNamespace parameter is empty."/>
+                </log>
+            </then>
+            <else/>
+        </filter>
+    </sequence>
+</template>

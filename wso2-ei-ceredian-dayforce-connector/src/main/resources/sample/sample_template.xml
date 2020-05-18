@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="get_employees" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="employeeNumber"/>
+    <sequence>
+        <property name="accept" scope="transport" type="STRING" value="application/json"/>
+        <property expression="fn:concat('Basic ',$ctx:ceredianDayForceAuthHeader)" name="Authorization" scope="transport" type="STRING"/>
+        <property name="uri.var.optional_query_params" scope="default" type="STRING" value=""/>
+        <!-- Filter each optional query parameter and append to optional query parameters list if they are not empty-->
+        <filter regex="true" source="boolean($func:employeeNumber)">
+            <then>
+                <property expression="fn:concat($ctx:uri.var.optional_query_params,'employeeNumber=',$func:employeeNumber,'&amp;')" name="uri.var.optional_query_params" scope="default" type="STRING"/>
+            </then>
+            <else/>
+        </filter>
+        <!--Add ? and remove tailing &-->
+        <filter regex="true" source="boolean($ctx:uri.var.optional_query_params)">
+            <then>
+                <property expression="fn:concat('?',$ctx:uri.var.optional_query_params)" name="uri.var.optional_query_params" scope="default" type="STRING"/>
+                <property expression="fn:string-length($ctx:uri.var.optional_query_params)" name="optional_query_params_length" scope="default" type="STRING"/>
+                <property expression="fn:substring($ctx:uri.var.optional_query_params, 1, $ctx:optional_query_params_length -1 )" name="uri.var.optional_query_params" scope="default" type="STRING"/>
+            </then>
+            <else/>
+        </filter>
+        <call>
+            <endpoint>
+                <http method="get" uri-template="https://{+uri.var.clientNamespace}/V1/Employees{uri.var.optional_query_params}">
+                    <suspendOnFailure>
+                        <initialDuration>-1</initialDuration>
+                        <progressionFactor>-1</progressionFactor>
+                        <maximumDuration>0</maximumDuration>
+                    </suspendOnFailure>
+                    <markForSuspension>
+                        <retriesBeforeSuspension>0</retriesBeforeSuspension>
+                    </markForSuspension>
+                </http>
+            </endpoint>
+        </call>
+    </sequence>
+</template>
